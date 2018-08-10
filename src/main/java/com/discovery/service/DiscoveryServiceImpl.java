@@ -1,5 +1,6 @@
 package com.discovery.service;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import com.discovery.repository.DiscoveryHostRepository;
 import com.discovery.repository.TagsRepository;
 import com.discovery.request.DiscoveryHostRequest;
 import com.discovery.response.DiscoveryHostResponse;
+import io.swagger.annotations.Tag;
 import javassist.NotFoundException;
 
 @Service
@@ -61,7 +63,12 @@ public class DiscoveryServiceImpl implements DiscoveryService {
     if(discoveryHosts.size() == 0) {
       throw new NotFoundException("No Service found with given name and ip address") ;
     }
-    discoveryHostRepository.deleteAll(discoveryHosts);
+    for(DiscoveryHost discoveryHost : discoveryHosts) {
+      Tags tags =  discoveryHost.getTags();
+      discoveryHostRepository.delete(discoveryHost);
+      tagsRepository.delete(tags);
+    }
+    
   }
 
   @Override
